@@ -5,6 +5,7 @@
     <span v-if="meetings.length == 0">
                Brak zaplanowanych spotkań.
            </span>
+
     <h3 v-else>
       Zaplanowane zajęcia ({{ meetings.length }})
     </h3>
@@ -23,25 +24,45 @@
 
     export default {
         components: {NewMeetingForm, MeetingsList},
-        props: ['username'],
+        props: ['username', 'meetings'],
         data() {
             return {
-                meetings: []
+				message: '',
+				isError: false
             };
         },
         methods: {
             addNewMeeting(meeting) {
-                this.meetings.push(meeting);
+				this.$http.post('meetings', meeting)
+                    .then((response) => {
+                        this.meetings.push({id: response.body.id, name:meeting.name, description: meeting.description, participants: meeting.participants});
+						this.success('');
+                    })
+                    .catch(response => this.failure('Błąd przy tworzeniu spotkania. Kod odpowiedzi: ' + response.status));
             },
             addMeetingParticipant(meeting) {
-                meeting.participants.push(this.username);
+				meeting.participants.push(this.username);
             },
             removeMeetingParticipant(meeting) {
-                meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
+            	 meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
             },
             deleteMeeting(meeting) {
-                this.meetings.splice(this.meetings.indexOf(meeting), 1);
-            }
+            	this.$http.delete(`meetings/${meeting.id}`)
+                    .then(() => {
+                         this.meetings.splice(this.meetings.indexOf(meeting), 1);
+                         this.success('');
+                    })
+                    .catch(response => this.failure('Błąd podczas usuwania spotkania. Kod odpowiedzi: ' + response.status));
+                
+            },
+			success(message) {
+                this.message = message;
+                this.isError = false;
+            },
+            failure(message) {
+                this.message = message;
+                this.isError = true;
+            },
         }
     }
 </script>

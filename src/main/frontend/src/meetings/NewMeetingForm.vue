@@ -3,9 +3,9 @@
     <form @submit.prevent="addNewMeeting()" v-if="adding">
       <h3>Dodaj nowe spotkanie</h3>
       <label>Nazwa</label>
-      <input type="text" v-model="newMeeting.name">
+      <input type="text" v-model="meeting.title">
       <label>Opis</label>
-      <textarea v-model="newMeeting.description"></textarea>
+      <textarea v-model="meeting.description"></textarea>
       <button>Dodaj</button>
       <span class="error" v-if="error">Spotkanie musi mieć nazwę!</span>
     </form>
@@ -17,7 +17,7 @@
     export default {
         data() {
             return {
-                newMeeting: {participants: []},
+                meeting: {participants: []},
                 adding: false,
                 error: false
             };
@@ -25,9 +25,9 @@
         methods: {
             addNewMeeting() {
                 this.error = false;
-                if (this.newMeeting.name) {
-                    this.$emit('added', this.newMeeting);
-                    this.newMeeting = {participants: []};
+                if (this.meeting.title) {
+                    this.$emit('added', this.meeting);
+                    this.meeting = {participants: []};
                     this.adding = false;
                 } else {
                     this.error = true;
